@@ -14,75 +14,63 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId + "\n");
-  // runSearch();
+  startMenu();
 });
 
-// function runSearch() {
-//   inquirer
-//     .prompt({
-//       name: "action",
-//       type: "rawlist",
-//       message: "What would you like to do?",
-//       choices: [
-//         "Find songs by artist",
-//         "Find all artists who appear more than once",
-//         "Find data within a specific range",
-//         "Search for a specific song",
-//         "Find artists with a top song and top album in the same year"
-//       ]
-//     })
-//     .then(function(answer) {
-//       switch (answer.action) {
-//       case "Find songs by artist":
-//         artistSearch();
-//         break;
+function startMenu() {
+  inquirer
+    .prompt({
+      name: "action",
+      type: "list",
+      message: "What would you like to do?",
+      choices: [
+        "Enter product ID you want to view",
+        "How many units do you want to buy?"
+        // "Find data within a specific range",
+        // "Search for a specific song",
+        // "Find artists with a top song and top album in the same year"
+      ]
+    })
+    .then(function (answer) {
+      switch (answer.action) {
 
-//       case "Find all artists who appear more than once":
-//         multiSearch();
-//         break;
+        case "Enter product ID you want to view":
+          productSearch();
+          break;
 
-//       case "Find data within a specific range":
-//         rangeSearch();
-//         break;
+        case "How many units do you want to buy?":
+          productBuy();
+          break;
+      }
+    });
+}
 
-//       case "Search for a specific song":
-//         songSearch();
-//         break;
+function productSearch() {
+  inquirer
+    .prompt({
+      name: "artist",
+      type: "input",
+      message: "What artist would you like to search for?"
+    })
+    .then(function (answer) {
+      var query = "SELECT position, song, year FROM top5000 WHERE ?";
+      connection.query(query, { artist: answer.artist }, function (err, res) {
+        for (var i = 0; i < res.length; i++) {
+          console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
+        }
+        startMenu();
+      });
+    });
+}
 
-//       case "Find artists with a top song and top album in the same year":
-//         songAndAlbumSearch();
-//         break;
-//       }
-//     });
-// }
-
-// function artistSearch() {
-//   inquirer
-//     .prompt({
-//       name: "artist",
-//       type: "input",
-//       message: "What artist would you like to search for?"
-//     })
-//     .then(function(answer) {
-//       var query = "SELECT position, song, year FROM top5000 WHERE ?";
-//       connection.query(query, { artist: answer.artist }, function(err, res) {
-//         for (var i = 0; i < res.length; i++) {
-//           console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
-//         }
-//         runSearch();
-//       });
-//     });
-// }
-
-// function multiSearch() {
-//   var query = "SELECT artist FROM top5000 GROUP BY artist HAVING count(*) > 1";
-//   connection.query(query, function(err, res) {
-//     for (var i = 0; i < res.length; i++) {
-//       console.log(res[i].artist);
-//     }
-//     runSearch();
-//   });
-// }
+function productBuy() {
+  // var query = "SELECT artist FROM top5000 GROUP BY artist HAVING count(*) > 1";
+  // connection.query(query, function(err, res) {
+  //   for (var i = 0; i < res.length; i++) {
+  //     console.log(res[i].artist);
+  //   }
+  startMenu();
+}
 
 // function rangeSearch() {
 //   inquirer
@@ -125,7 +113,7 @@ connection.connect(function (err) {
 //               res[i].year
 //           );
 //         }
-//         runSearch();
+//         startMenu();
 //       });
 //     });
 // }
@@ -150,7 +138,7 @@ connection.connect(function (err) {
 //             " || Year: " +
 //             res[0].year
 //         );
-//         runSearch();
+//         startMenu();
 //       });
 //     });
 // }
@@ -185,7 +173,7 @@ connection.connect(function (err) {
 //           );
 //         }
 
-//         runSearch();
+//         startMenu();
 //       });
 //     });
 // }

@@ -18,8 +18,7 @@ connection.connect(function (err) {
 
 function readProducts() {
   console.log("Reading all products...\n");
-  connection.query("select * from products", function(err, res) 
-  {
+  connection.query("select * from products", function (err, res) {
     if (err) throw err;
     console.table(res)
     startMenu();
@@ -28,44 +27,53 @@ function readProducts() {
 }
 
 function startMenu() {
-    inquirer
-      .prompt([
-        {
-          name: "productID",
-          type: "input",
-          message: "What product ID do you want to buy?"
-        },
-        {
-          name: "productQuantity",
-          type: "input",
-          message: "How many units of that product do you want to buy?",
-          validate: function (value) {
-            if (isNaN(value) === false) {
-              return true;
-            }
-            return false;
+  inquirer
+    .prompt([
+      {
+        name: "productID",
+        type: "input",
+        message: "What product ID do you want to buy?",   
+        validate: function (value) {
+          if (isNaN(value) === false)
+          {
+            return true;
           }
-        }
-      ])
-};
+          return false;
+          } 
+      },
+      {
+        name: "productQuantity",
+        type: "input",
+        message: "How many units of that product do you want to buy?",
+        validate: function (value) {
+          if (isNaN(value) === false)
+          {
+            return true;
+          }
+          return false;
+          }
+      }
+    ])
+    .then(function(answer) {
+      if(answer.productID > 0)
+      {
+        updateProducts();
+      }
+      else       
+        connection.end();
+      }
+    )};
 
 function updateProducts() {
-    console.log("Updating all product quantities...\n");
-    var query = connection.query(
-      "update products set ? where ?",
-      [
-        {
-          productID: item_id
-        },
-        {
-          productQuantity: stock_quantity
-        }
-      ], 
-      function (err, res) 
-      {
-        if (err) throw err;
-        console.log(res.affectedRows + " products updated!\n");
-      readProducts();
-      }
-    )
-  };
+  console.log("Updating all product quantities...\n");
+  var query = connection.query(
+    "update products set ? where ?",
+    [{item_id: answer.productID}, 
+       {stock_quantity: answer.productQuantity}],
+    function (err, res) {
+      if (err) throw err;
+      console.log(res.affectedRows + " products updated!\n");
+      // readProducts();
+    }
+  )
+};

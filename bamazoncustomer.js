@@ -22,7 +22,7 @@ function readProducts() {
     if (err) throw err;
     console.table(res)
     startMenu();
-    connection.end();
+   // connection.end();
   });
 }
 
@@ -55,25 +55,48 @@ function startMenu() {
       }
     ])
     .then(function(answer) {
+      console.log(answer)
       if(answer.productID > 0)
       {
-        updateProducts();
+
+        updateProducts(answer);
       }
       else       
         connection.end();
       }
     )};
 
-function updateProducts() {
+function updateProducts(data) {
+  console.log("data:", data)
   console.log("Updating all product quantities...\n");
-  var query = connection.query(
+  connection.query("select * from products where item_id=" + parseInt(data.productID) , function (err, res) {
+    if (err) throw err;
+ console.log(res[0].stock_quantity)
+ if (parseInt(data.productQuantity) <= res[0].stock_quantity){
+
+
+
+  // select by id then get the stock then update
+ // var newstock = // oldstock - quatity purchase
+  connection.query(
     "update products set ? where ?",
-    [{item_id: answer.productID}, 
-       {stock_quantity: answer.productQuantity}],
+    [
+      {stock_quantity:res[0].stock_quantity - parseInt(data.productQuantity)},
+      {item_id: parseInt(data.productID)}
+    ],
     function (err, res) {
       if (err) throw err;
       console.log(res.affectedRows + " products updated!\n");
-      // readProducts();
+       readProducts();
     }
+
   )
+ }
+ else {
+console.log("Not enough stock. Pick something else.")
+startMenu();
+ }
+ 
+
+  });
 };

@@ -79,6 +79,7 @@ function updateProducts(data) {
         function (err, res) {
           if (err) throw err;
           console.log(res.affectedRows + " product updated!");
+          // console.log("total price: " + res[0].price * parseInt(data.productQuantity));
           readProducts();
         }
       )

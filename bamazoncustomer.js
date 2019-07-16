@@ -63,13 +63,14 @@ function startMenu() {
 };
 
 function updateProducts(data) {
-  // console.log("data:", data)
+  console.log("data:", data)
+  const { productID, productQuantity } = data;
   console.log("\nChecking and updating database...\n");
-  connection.query("select * from products where item_id=" + parseInt(data.productID), function (err, res) {
+  connection.query("select * from products where item_id=" + parseInt(productID), function (err, res) {
   
   if (err) throw err;
     // console.log(res[0].stock_quantity)s
-    if (parseInt(data.productQuantity) <= res[0].stock_quantity) {
+    if (parseInt(productQuantity) <= res[0].stock_quantity) {
       connection.query(
         "update products set ? where ?",
         [
@@ -79,10 +80,16 @@ function updateProducts(data) {
         function (err, res) {
           if (err) throw err;
           console.log(res.affectedRows + " product updated!");
+console.log(res)
+console.log('data', data)
           // console.log("total price: " + res[0].price * parseInt(data.productQuantity));
           readProducts();
         }
+
       )
+      // .then(connection.query(`select * from products where item_id=${productID}`), function(err, res){
+      //   console.log(res)
+      // })
     }
     else {
       console.log("*****INSUFFICIENT QUANTITY! PICK SOMETHING ELSE.*****\n")

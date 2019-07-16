@@ -12,17 +12,16 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
   if (err) throw err;
-  console.log("connected as id " + connection.threadId + "\n");
+  console.log("connected as id " + connection.threadId);
   readProducts();
 });
 
 function readProducts() {
-  console.log("Reading all products...\n");
+  console.log("\n*****Displaying all products*****\n");
   connection.query("select * from products", function (err, res) {
     if (err) throw err;
     console.table(res)
     startMenu();
-   // connection.end();
   });
 }
 
@@ -32,71 +31,61 @@ function startMenu() {
       {
         name: "productID",
         type: "input",
-        message: "What product ID do you want to buy?",   
+        message: "What product ID do you want to buy?",
         validate: function (value) {
-          if (isNaN(value) === false)
-          {
+          if (isNaN(value) === false) {
             return true;
           }
           return false;
-          } 
+        }
       },
       {
         name: "productQuantity",
         type: "input",
         message: "How many units of that product do you want to buy?",
         validate: function (value) {
-          if (isNaN(value) === false)
-          {
+          if (isNaN(value) === false) {
             return true;
           }
           return false;
-          }
+        }
       }
     ])
-    .then(function(answer) {
+    .then(function (answer) {
       console.log(answer)
-      if(answer.productID > 0)
-      {
-
+      if (answer.productID > 0) {
         updateProducts(answer);
       }
-      else       
+      else
         connection.end();
-      }
-    )};
+    }
+    )
+};
 
 function updateProducts(data) {
-  console.log("data:", data)
-  console.log("Updating all product quantities...\n");
-  connection.query("select * from products where item_id=" + parseInt(data.productID) , function (err, res) {
-    if (err) throw err;
- console.log(res[0].stock_quantity)
- if (parseInt(data.productQuantity) <= res[0].stock_quantity){
-
-
-
-  // select by id then get the stock then update
- // var newstock = // oldstock - quatity purchase
-  connection.query(
-    "update products set ? where ?",
-    [
-      {stock_quantity:res[0].stock_quantity - parseInt(data.productQuantity)},
-      {item_id: parseInt(data.productID)}
-    ],
-    function (err, res) {
-      if (err) throw err;
-      console.log(res.affectedRows + " products updated!\n");
-       readProducts();
+  // console.log("data:", data)
+  console.log("\nChecking and updating database...\n");
+  connection.query("select * from products where item_id=" + parseInt(data.productID), function (err, res) {
+  
+  if (err) throw err;
+    // console.log(res[0].stock_quantity)s
+    if (parseInt(data.productQuantity) <= res[0].stock_quantity) {
+      connection.query(
+        "update products set ? where ?",
+        [
+          { stock_quantity: res[0].stock_quantity - parseInt(data.productQuantity) },
+          { item_id: parseInt(data.productID) }
+        ],
+        function (err, res) {
+          if (err) throw err;
+          console.log(res.affectedRows + " product updated!");
+          readProducts();
+        }
+      )
     }
-
-  )
- }
- else {
-console.log("Not enough stock. Pick something else.")
-startMenu();
- }
- 
-
+    else {
+      console.log("*****INSUFFICIENT QUANTITY! PICK SOMETHING ELSE.*****\n")
+      startMenu();
+    }
   });
 };

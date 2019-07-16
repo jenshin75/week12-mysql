@@ -17,5 +17,5 @@ If quanity in database is less than quantity entered, then you will get this mes
 
 If quanity in database is greater than quantity entered, then database will be updated accordingly and price of the total order will be displayed.
 
-![Sufficient - Before Update](./images/sufficient - before.PNG)
-![Sufficient - After Update](./images/sufficient - after.PNG)
+![Sufficient - Before Update](./images/sufficient_before.PNG)
+![Sufficient - After Update](./images/sufficient_after.PNG)
